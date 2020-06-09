@@ -27,13 +27,13 @@ from light.nn import MixSoftmaxCrossEntropyLoss, MixSoftmaxCrossEntropyOHEMLoss
 def parse_args():
     parser = argparse.ArgumentParser(description='Light Model for Segmentation')
     # model and dataset
-    parser.add_argument('--model', type=str, default='efficientnet',
-                        help='model name (default: mobilenet)')
-    parser.add_argument('--dataset', type=str, default='citys',
-                        help='dataset name (default: citys)')
-    parser.add_argument('--base-size', type=int, default=1024,
+    parser.add_argument('--model', type=str, default='mobilenetv3_small',
+                        help='model name (default: mobilenetv3_small)')
+    parser.add_argument('--dataset', type=str, default='eyes',
+                        help='dataset name (default: eyes)')
+    parser.add_argument('--base-size', type=int, default=80,
                         help='base image size')
-    parser.add_argument('--crop-size', type=int, default=768,
+    parser.add_argument('--crop-size', type=int, default=70,
                         help='crop image size')
     parser.add_argument('--workers', '-j', type=int, default=4,
                         metavar='N', help='dataloader threads')
@@ -44,7 +44,7 @@ def parse_args():
                         help='Auxiliary loss')
     parser.add_argument('--aux-weight', type=float, default=0.4,
                         help='auxiliary loss weight')
-    parser.add_argument('--batch-size', type=int, default=4, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=32, metavar='N',
                         help='input batch size for training (default: 4)')
     parser.add_argument('--start_epoch', type=int, default=0,
                         metavar='N', help='start epochs (default:0)')
@@ -78,7 +78,7 @@ def parse_args():
     parser.add_argument('--log-iter', type=int, default=10,
                         help='print log every log-iter')
     # evaluation only
-    parser.add_argument('--skip-val', action='store_true', default=False,
+    parser.add_argument('--skip-val', action='store_true', default=True,
                         help='skip validation during training')
     parser.add_argument('--val-epoch', type=int, default=1,
                         help='run validation every val-epoch')

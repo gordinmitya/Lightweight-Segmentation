@@ -16,6 +16,8 @@ from light.utils.metric import SegmentationMetric
 from light.utils.visualize import get_color_pallete
 from light.utils.logger import setup_logger
 from light.utils.distributed import synchronize, get_rank, make_data_sampler, make_batch_data_sampler
+import cv2
+import numpy as np
 
 from train import parse_args
 
@@ -32,7 +34,7 @@ class Evaluator(object):
         ])
 
         # dataset and dataloader
-        val_dataset = get_segmentation_dataset(args.dataset, split='val', mode='testval', transform=input_transform)
+        val_dataset = get_segmentation_dataset('eyes', split='val', mode='testval', transform=input_transform)
         val_sampler = make_data_sampler(val_dataset, False, args.distributed)
         val_batch_sampler = make_batch_data_sampler(val_sampler, images_per_batch=1)
         self.val_loader = data.DataLoader(dataset=val_dataset,
@@ -68,13 +70,24 @@ class Evaluator(object):
             logger.info("Sample: {:d}, validation pixAcc: {:.3f}, mIoU: {:.3f}".format(
                 i + 1, pixAcc * 100, mIoU * 100))
 
-            if self.args.save_pred:
+            if True:
                 pred = torch.argmax(outputs[0], 1)
                 pred = pred.cpu().data.numpy()
 
                 predict = pred.squeeze(0)
-                mask = get_color_pallete(predict, self.args.dataset)
-                # mask.save(os.path.join(outdir, os.path.splitext(filename[0])[0] + '.png'))
+                # mask = get_color_pallete(predict, self.args.dataset)
+                image = image.cpu().data.numpy().squeeze(0).transpose((1,2,0))
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+                colors = np.array([[255,0,0], [0,255,0], [0,0,255]])
+
+                res = np.zeros((image.shape[0]*3, image.shape[1], 3))
+                inp = ((image + 1) * 127.5).astype('int')
+                msk = colors[predict]
+                res[0:image.shape[0],:,:] = inp
+                res[image.shape[0]:image.shape[0]*2,:,:] = msk
+                res[image.shape[0]*2:,:,:] = cv2.addWeighted(inp, 0.5, msk, 0.5, 0)
+                cv2.imwrite(f'/root/mitya/Lightweight-Segmentation/results/{i}.png', res)
         synchronize()
 
 

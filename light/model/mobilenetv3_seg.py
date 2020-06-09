@@ -56,7 +56,7 @@ class _LRASPP(nn.Module):
             nn.ReLU(True)
         )
         self.b1 = nn.Sequential(
-            nn.AvgPool2d(kernel_size=(49, 49), stride=(16, 20)),  # check it
+            # nn.AvgPool2d(kernel_size=(4, 4), stride=(16, 20)),  # check it
             nn.Conv2d(in_channels, out_channels, 1, bias=False),
             nn.Sigmoid(),
         )
@@ -97,6 +97,7 @@ def get_mobilenet_v3_small_seg(dataset='citys', pretrained=False, root='~/.torch
         'ade20k': 'ade',
         'coco': 'coco',
         'citys': 'citys',
+        'eyes': 'eyes'
     }
     from light.data import datasets
     model = MobileNetV3Seg(datasets[dataset].NUM_CLASS, backbone='mobilenetv3_small',
@@ -104,7 +105,7 @@ def get_mobilenet_v3_small_seg(dataset='citys', pretrained=False, root='~/.torch
     if pretrained:
         from ..model import get_model_file
         model.load_state_dict(
-            torch.load(get_model_file('mobilenetv3_small_%s_best_model' % (acronyms[dataset]), root=root)))
+            torch.load(get_model_file('mobilenetv3_small_%s' % (acronyms[dataset]), root=root)))
     return model
 
 
